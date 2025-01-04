@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaun Banega Crorepati</title>
+  
+<style>
+          body {
+  font-family: Arial, sans-serif;
+  background-image: linear-gradient(to bottom right, rgb(178, 91, 178), rgb(134, 134, 238));
+  color: #ecf0f1;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.game-container {
+  text-align: center;
+  background-image: linear-gradient(to bottom right, rgb(143, 7, 143), rgb(33, 33, 225));
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  height: 520px;
+  max-width: 600px;
+  box-shadow: 10 10px 20px rgba(183, 166, 166, 0.5);
+  
+}
+img{
+          height: 100px;
+          width: 25%;
+          border-radius: 50%;
+          box-shadow: 5px 5px 10px rgb(197, 193, 218),0px 0px 10px rgb(197, 192, 218);
+}
+#answers button {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background: #29b9b2;
+  color: #ecf0f1;
+  cursor: pointer;
+}
+
+#answers button:hover {
+  background: #c4d74c;
+}
+
+#next-question {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background: #e67e22;
+  color: #ecf0f1;
+  cursor: pointer;
+}
+
+#next-question:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+}
+
+h3 {
+  margin-top: 20px;
+}
+
+
+</style>
+
+</head>
+<body>
+
+  <div class="game-container">
+
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNlAcgEuJliDDu1ZuIE7qM-0w0GIxzK7D98l1s-GcLQajUH9x2fozupFr17gollly1vI4&usqp=CAU" alt="">
+    
+
+    <h1>Kaun Banega Crorepati</h1>
+    <div id="question-container">
+      <h2 id="question">Question will appear here</h2>
+      <div id="answers">
+      </div>
+    </div>
+    <button id="next-question" disabled>Next Question</button>
+    <h3 id="prize-money">Prize Money: ₹0</h3>
+  </div>
+  <script>
+
+const allQuestions = [
+  {
+    question: "What is the capital of India?",
+    options: ["Mumbai", "Delhi", "Kolkata", "Chennai"],
+    answer: "Delhi",
+  },
+  {
+    question: "Who wrote the national anthem of India?",
+    options: ["Rabindranath Tagore", "Mahatma Gandhi", "Subhas Chandra Bose", "Sarojini Naidu"],
+    answer: "Rabindranath Tagore",
+  },
+  {
+    question: "What is the national animal of India?",
+    options: ["Elephant", "Tiger", "Peacock", "Lion"],
+    answer: "Tiger",
+  },
+  {
+    question: "Who was the first Prime Minister of India?",
+    options: ["Mahatma Gandhi", "Jawaharlal Nehru", "Indira Gandhi", "Rajendra Prasad"],
+    answer: "Jawaharlal Nehru",
+  },
+  {
+    question: "Which is the largest planet in our solar system?",
+    options: ["Earth", "Mars", "Jupiter", "Saturn"],
+    answer: "Jupiter",
+  },
+  {
+    question: "Which is the smallest continent?",
+    options: ["Asia", "Australia", "Europe", "South America"],
+    answer: "Australia",
+  },
+  {
+    question: "What is the chemical symbol for water?",
+    options: ["H2O", "O2", "CO2", "HO2"],
+    answer: "H2O",
+  },
+  {
+    question: "How many states are there in India?",
+    options: ["28", "29", "30", "31"],
+    answer: "28",
+  },
+  {
+    question: "Who discovered gravity?",
+    options: ["Albert Einstein", "Isaac Newton", "Galileo Galilei", "Nikola Tesla"],
+    answer: "Isaac Newton",
+  },
+  {
+    question: "What is the square root of 64?",
+    options: ["6", "7", "8", "9"],
+    answer: "8",
+  },
+  {
+    question: "Which country is known as the Land of the Rising Sun?",
+    options: ["India", "China", "Japan", "Korea"],
+    answer: "Japan",
+  },
+  {
+    question: "What is the boiling point of water at sea level?",
+    options: ["90°C", "100°C", "110°C", "120°C"],
+    answer: "100°C",
+  },
+  {
+    question: "Who painted the Mona Lisa?",
+    options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet"],
+    answer: "Leonardo da Vinci",
+  },
+  {
+    question: "Which is the longest river in the world?",
+    options: ["Amazon", "Nile", "Yangtze", "Mississippi"],
+    answer: "Nile",
+  },
+  {
+    question: "What is the capital of France?",
+    options: ["Paris", "Berlin", "Rome", "Madrid"],
+    answer: "Paris",
+  },
+];
+
+let questions = [];
+let currentQuestionIndex = 0;
+let prizeMoney = 0;
+const prizeLevels = [0, 10000, 50000, 100000, 200000, 500000, 1000000, 5000000, 10000000, 20000000, 30000000, 50000000, 70000000, 100000000, 150000000];
+
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const nextButton = document.getElementById("next-question");
+const prizeEl = document.getElementById("prize-money");
+
+// Shuffle and select 15 random questions
+function selectRandomQuestions() {
+  const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+  questions = shuffled.slice(0, 15);
+}
+
+function loadQuestion() {
+  if (currentQuestionIndex >= questions.length) {
+    alert(`Game Over! You won ₹${prizeMoney}`);
+    location.reload();
+    return;
+  }
+
+  const currentQuestion = questions[currentQuestionIndex];
+  questionEl.textContent = currentQuestion.question;
+  answersEl.innerHTML = "";
+  nextButton.disabled = true;
+
+  currentQuestion.options.forEach(option => {
+    const button = document.createElement("button");
+    button.textContent = option;
+    button.onclick = () => selectAnswer(option);
+    answersEl.appendChild(button);
+  });
+}
+
+function selectAnswer(selected) {
+  const currentQuestion = questions[currentQuestionIndex];
+  if (selected === currentQuestion.answer) {
+    prizeMoney = prizeLevels[currentQuestionIndex + 1];
+    prizeEl.textContent = `Prize Money: ₹${prizeMoney}`;
+    nextButton.disabled = false;
+  } else {
+    alert(`Wrong answer! You won ₹${prizeMoney}`);
+    location.reload();
+  }
+}
+
+nextButton.onclick = () => {
+  currentQuestionIndex++;
+  loadQuestion();
+};
+
+// Initialize the game
+selectRandomQuestions();
+loadQuestion();
+
+</script>
+</body>
+</html>
